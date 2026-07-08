@@ -1,0 +1,34 @@
+/* =========================================================
+   bloomwright-ui — DaisyUI include preset (reference).
+
+   bloomwright-ui components rely on the DaisyUI parts listed below. bloomwright-ui does
+   NOT register the DaisyUI plugin (the consumer keeps a single copy of
+   Tailwind + DaisyUI). Copy this `include` list into YOUR OWN `@plugin` block:
+
+     @plugin "daisyui" {
+       themes: light, dark;              // your themes / brand tokens
+       include:
+         "button", "card", "badge", "mockup", "steps", "chat", "list",
+         "modal", "table", "input", "select";
+     }
+
+   Also register bloomwright-ui as a Tailwind source so its class names are scanned:
+
+     @source "../node_modules/bloomwright-ui/src";
+
+   Audit (BUI-008) — where each part is used:
+     button  → <Button>, list/section-header CTAs, overlay close buttons (btn *)
+     card    → <Callout> (.card.callout-card)
+     badge   → <List> status pills (.badge)
+     mockup  → <MockupBrowser|Phone|Window>, <CodeBlock> (mockup-code)
+     steps   → <Steps> (.steps/.step)
+     chat    → <ChatBubble> (.chat/.chat-bubble)
+     list    → <List> (.list/.list-row/.list-col-*)
+     modal   → <OverlayPanel> (.modal/.modal-box/.modal-backdrop)
+     table   → <ProseTable> (.table)
+     input   → <MockupBrowser> address field (.input)
+     select  → <VideoPlayer> quality control (.select)
+
+   `join`, `alert`, and `link` are intentionally omitted — no shipped component
+   uses them. Add them back only if a future component needs them.
+   ========================================================= */

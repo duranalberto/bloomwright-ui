@@ -1,0 +1,89 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+export interface Props extends HTMLAttributes<"figure"> {
+  url?: string;
+  browserClass?: string;
+  toolbarClass?: string;
+  addressClass?: string;
+  contentClass?: string;
+  captionClass?: string;
+}
+
+const {
+  url,
+  class: className,
+  browserClass,
+  toolbarClass,
+  addressClass,
+  contentClass,
+  captionClass,
+  ...figureAttributes
+} = Astro.props;
+
+const hasToolbar = Astro.slots.has("toolbar");
+const hasCaption = Astro.slots.has("caption");
+
+if (!hasToolbar && (!url || url.trim().length === 0)) {
+  throw new Error(
+    "MockupBrowser requires a non-empty url when the toolbar slot is omitted.",
+  );
+}
+---
+
+<figure
+  {...figureAttributes}
+  class:list={["mockup-browser-figure not-prose", className]}
+>
+  <div
+    class:list={[
+      "mockup-browser mockup-browser-frame border border-base-300 bg-base-100 text-base-content",
+      browserClass,
+    ]}
+  >
+    <div
+      class:list={[
+        "mockup-browser-toolbar mockup-browser-toolbar-region",
+        toolbarClass,
+      ]}
+    >
+      {
+        hasToolbar ? (
+          <slot name="toolbar" />
+        ) : (
+          <div
+            class:list={[
+              "input mockup-browser-address bg-base-200 text-base-content",
+              addressClass,
+            ]}
+          >
+            <span class="sr-only">Address:</span>
+            <span class="mockup-browser-address-value">{url}</span>
+          </div>
+        )
+      }
+    </div>
+
+    <div
+      class:list={[
+        "mockup-browser-content mockup-static-media border-t border-base-300 bg-base-100",
+        contentClass,
+      ]}
+    >
+      <slot />
+    </div>
+  </div>
+
+  {
+    hasCaption && (
+      <figcaption
+        class:list={[
+          "mockup-browser-caption text-base-content/70",
+          captionClass,
+        ]}
+      >
+        <slot name="caption" />
+      </figcaption>
+    )
+  }
+</figure>

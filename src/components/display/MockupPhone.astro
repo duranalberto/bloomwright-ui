@@ -1,0 +1,52 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+export interface Props extends HTMLAttributes<"figure"> {
+  phoneClass?: string;
+  cameraClass?: string;
+  displayClass?: string;
+  captionClass?: string;
+}
+
+const {
+  class: className,
+  phoneClass,
+  cameraClass,
+  displayClass,
+  captionClass,
+  ...figureAttributes
+} = Astro.props;
+
+const hasCaption = Astro.slots.has("caption");
+---
+
+<figure
+  {...figureAttributes}
+  class:list={["mockup-phone-figure not-prose", className]}
+>
+  <div class:list={["mockup-phone mockup-phone-frame", phoneClass]}>
+    <div
+      class:list={["mockup-phone-camera", cameraClass]}
+      aria-hidden="true"
+    ></div>
+
+    <div
+      class:list={[
+        "mockup-phone-display mockup-static-media bg-base-100 text-base-content",
+        displayClass,
+      ]}
+    >
+      <slot />
+    </div>
+  </div>
+
+  {
+    hasCaption && (
+      <figcaption
+        class:list={["mockup-phone-caption text-base-content/70", captionClass]}
+      >
+        <slot name="caption" />
+      </figcaption>
+    )
+  }
+</figure>

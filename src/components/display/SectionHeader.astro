@@ -1,0 +1,61 @@
+---
+import { resolveSectionHeader } from "../../logic/section-header.ts";
+import Button from "../primitive/Button.astro";
+
+interface Props {
+  title: string;
+  id?: string | undefined;
+  level?: 2 | 3;
+  linkHref?: string;
+  linkLabel?: string;
+  linkExternal?: boolean;
+}
+
+const {
+  title,
+  id,
+  level = 2,
+  linkHref,
+  linkLabel,
+  linkExternal = false,
+} = Astro.props as Props;
+const resolved = resolveSectionHeader({
+  title,
+  id,
+  level,
+  link:
+    linkHref && linkLabel
+      ? { href: linkHref, label: linkLabel, external: linkExternal }
+      : undefined,
+});
+const HeadingTag = resolved.headingTag;
+---
+
+<div
+  class="flex flex-col w-full max-w-screen-2xl mx-auto gap-6 pb-8 md:pb-10 sm:flex-row sm:items-center sm:justify-between sm:gap-0"
+>
+  <div class="flex items-center h-10 md:h-12 gap-4 border-l-4 border-primary">
+    <HeadingTag
+      id={resolved.id}
+      class="pl-4 text-3xl sm:text-4xl font-display font-semibold tracking-tight text-base-content"
+    >
+      {resolved.title}
+    </HeadingTag>
+  </div>
+
+  {
+    resolved.link && (
+      <div class="self-start sm:self-auto">
+        <Button
+          href={resolved.link.href}
+          label={resolved.link.label}
+          size="btn-lg"
+          variant="btn-primary"
+          isExternal={resolved.link.external}
+          ariaLabel={resolved.link.label}
+          class="shadow-lg hover:scale-105 active:scale-95 transition-transform"
+        />
+      </div>
+    )
+  }
+</div>

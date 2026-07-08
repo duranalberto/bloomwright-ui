@@ -1,0 +1,102 @@
+---
+import type { ButtonSize, ButtonVariant } from "../../types/button.ts";
+import { type Icon } from "../../types/icon.ts";
+import SVGIcon from "./SVGIcon.astro";
+
+interface Props {
+  href?: string;
+  icon?: Icon;
+  label?: string;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  isExternal?: boolean;
+  id?: string;
+  class?: string;
+  type?: "button" | "submit" | "reset";
+  ariaLabel?: string;
+}
+
+const {
+  href,
+  icon,
+  label,
+  variant = "btn-primary",
+  size = "btn-md",
+  isExternal = false,
+  class: className,
+  id,
+  type = "button",
+  ariaLabel,
+} = Astro.props;
+
+const displayText = label || icon?.text || "";
+const Tag = href ? "a" : "button";
+
+const externalProps = isExternal
+  ? { target: "_blank", rel: "noopener noreferrer" }
+  : {};
+
+const SIZE_CONFIG: Record<
+  ButtonSize,
+  {
+    gap: string;
+    icon: string;
+    text: string;
+  }
+> = {
+  "btn-xs": {
+    gap: "gap-1.5",
+    icon: "w-3 h-3",
+    text: "text-xs",
+  },
+  "btn-sm": {
+    gap: "gap-2",
+    icon: "w-4 h-4",
+    text: "text-sm",
+  },
+  "btn-md": {
+    gap: "gap-2.5",
+    icon: "w-5 h-5",
+    text: "text-sm",
+  },
+  "btn-lg": {
+    gap: "gap-3",
+    icon: "w-6 h-6",
+    text: "text-base",
+  },
+};
+
+const sizeConfig = SIZE_CONFIG[size];
+
+const computedAriaLabel =
+  ariaLabel || (displayText ? undefined : icon?.text || undefined);
+---
+
+<Tag
+  id={id}
+  href={href}
+  type={!href ? type : undefined}
+  aria-label={computedAriaLabel}
+  {...externalProps}
+  class:list={[
+    "btn",
+    variant,
+    size,
+    "inline-flex items-center",
+    sizeConfig.gap,
+    "normal-case font-medium",
+    sizeConfig.text,
+    "transition-all duration-200",
+    className,
+  ]}
+>
+  {
+    icon && (
+      <SVGIcon icon={icon} class={sizeConfig.icon} />
+    )
+  }
+
+  {displayText && <span class="tracking-wide">{displayText}</span>}
+
+  <slot />
+</Tag>

@@ -1,0 +1,19 @@
+---
+/**
+ * CodeBlock — the `mockup-code` wrapper for a highlighted code block.
+ *
+ * Dual-use: drop it into any `.astro` page directly, or map it to `pre` in an
+ * MDX `components` map. The wrapper classes come from `logic/code-block.ts`, the
+ * same source bloomwright-mdx's `createCodeBlockPlugin()` uses — so hand-written
+ * and MDX-driven code blocks render identically.
+ */
+import { CODE_BLOCK_WRAPPER_CLASS } from "../../logic/code-block.ts";
+---
+
+<div class="not-prose">
+  <div class={CODE_BLOCK_WRAPPER_CLASS}>
+    <div class="overflow-x-auto">
+      <slot />
+    </div>
+  </div>
+</div>

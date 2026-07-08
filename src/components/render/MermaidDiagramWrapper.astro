@@ -1,0 +1,230 @@
+---
+/**
+ * MermaidDiagramWrapper.astro
+ *
+ * MDX component replacement for `.mermaid-diagram-container` nodes emitted by
+ * the Sätteri Mermaid plugin. Diagrams render as static SVG assets so the page
+ * remains readable without JavaScript; the custom element only keeps the Open
+ * link aligned with the active theme.
+ */
+
+interface Props {
+  class?: string;
+  [key: string]: unknown;
+}
+
+const { class: className, "data-diagram-svg": diagramSvgB64, ...rest } =
+  Astro.props;
+
+const isDiagram =
+  className?.split(/\s+/).includes("mermaid-diagram-container") ?? false;
+
+// Inline SVG markup (base64-encoded by the Sätteri plugin). Rendering it inline
+// — rather than as an <img> — makes the diagram's label text selectable and
+// lets its multi-theme CSS follow the page theme. The expand popover clones this
+// same figure at runtime, so only one copy ships in the HTML.
+// Collapse each run of line-break tags in a label down to a single `<br/>`.
+// Mermaid authors one break per line as `<br></br>`, a single break when the
+// asset is read as XML (the standalone .svg file). But this SVG is built with
+// `hast-util-from-html`, whose HTML parsing of the `<foreignObject>` content
+// turns the void `<br>` plus its stray `</br>` end tag into TWO `<br>` nodes —
+// so the inlined markup arrives here as `<br/><br/>` and every 2-line label
+// renders as 3 lines that overflow and clip inside its fixed foreignObject box
+// (only the first line stays visible). Collapsing consecutive break tags makes
+// the inlined copy render identically to the standalone asset, without
+// re-rendering it. The run regex also absorbs the raw `<br></br>` form so the
+// fix holds whichever way the SVG reaches this component.
+const diagramSvg =
+  typeof diagramSvgB64 === "string" && diagramSvgB64.length > 0
+    ? Buffer.from(diagramSvgB64, "base64")
+        .toString("utf8")
+        .replace(/(?:<br\s*\/?>|<\/br>)(?:\s*(?:<br\s*\/?>|<\/br>))*/gi, "<br/>")
+    : null;
+
+const diagramSrc =
+  typeof rest["data-diagram-src"] === "string" &&
+  rest["data-diagram-src"].length > 0
+    ? (rest["data-diagram-src"] as string)
+    : null;
+const diagramDarkSrc =
+  typeof rest["data-diagram-dark-src"] === "string" &&
+  rest["data-diagram-dark-src"].length > 0
+    ? (rest["data-diagram-dark-src"] as string)
+    : diagramSrc;
+const diagramType =
+  typeof rest["data-diagram-type"] === "string" &&
+  rest["data-diagram-type"].length > 0
+    ? (rest["data-diagram-type"] as string)
+    : "diagram";
+
+const diagramLabel = `${diagramType.charAt(0).toUpperCase()}${diagramType.slice(1)}`;
+const popoverId = `diagram-popover-${crypto.randomUUID().replace(/-/g, "").slice(0, 12)}`;
+const popoverTitleId = `${popoverId}-title`;
+
+// Intrinsic diagram dimensions (from the SVG viewBox, emitted by the Mermaid
+// Sätteri plugin). Used to stamp an explicit aspect ratio on the images so the
+// expand popover can fit them to the viewport without relying on the assets'
+// unreliable intrinsic sizes.
+//
+// The landscape popover suits mid-ratio diagrams, but the extremes fit poorly:
+// a very wide diagram fitted to width becomes a thin strip, and a very tall one
+// fitted to height becomes a narrow sliver. Diagrams outside the mid band get a
+// modifier class that lets the image grow past the popover in its deficient
+// dimension (bounded by a CSS cap) and scroll, so it uses the available space
+// without runaway panning/scrolling.
+const WIDE_ASPECT_THRESHOLD = 2;
+const TALL_ASPECT_THRESHOLD = 0.5;
+const parseDim = (value: unknown): number => {
+  if (typeof value === "number") return value;
+  if (typeof value === "string") return Number.parseFloat(value);
+  return Number.NaN;
+};
+const diagramWidth = parseDim(rest["data-diagram-width"]);
+const diagramHeight = parseDim(rest["data-diagram-height"]);
+const hasDims =
+  Number.isFinite(diagramWidth) &&
+  Number.isFinite(diagramHeight) &&
+  diagramWidth > 0 &&
+  diagramHeight > 0;
+const aspectRatio = hasDims ? diagramWidth / diagramHeight : 1;
+const aspectStyle = hasDims
+  ? `aspect-ratio: ${diagramWidth} / ${diagramHeight}; --diagram-ar: ${aspectRatio.toFixed(4)}; --diagram-w: ${diagramWidth}px; --diagram-h: ${diagramHeight}px;`
+  : undefined;
+const sizeModeClass = !hasDims
+  ? ""
+  : aspectRatio >= WIDE_ASPECT_THRESHOLD
+    ? " is-wide"
+    : aspectRatio <= TALL_ASPECT_THRESHOLD
+      ? " is-tall"
+      : "";
+const popoverScrollClass = `ui-panel-scroll diagram-popover-scroll${sizeModeClass}`;
+---
+
+{
+  isDiagram ? (
+    diagramSvg ? (
+      <mermaid-diagram-shell class="diagram-wrapper not-prose">
+        <div class={className} {...rest}>
+          <div
+            class="mermaid-diagram-image"
+            style={aspectStyle}
+            set:html={diagramSvg}
+          />
+        </div>
+
+        <div class="ui-panel-action-grid" data-no-js-single>
+          <a
+            class="ui-panel-action"
+            href={diagramSrc}
+            data-diagram-open-link
+            data-diagram-light-src={diagramSrc}
+            data-diagram-dark-src={diagramDarkSrc}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Open ${diagramLabel} SVG in a new tab`}
+          >
+            <svg
+              viewBox="0 0 16 16"
+              width="13"
+              height="13"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M9 2h5v5" />
+              <path d="M7 9 14 2" />
+              <path d="M14 10v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h3" />
+            </svg>
+            <span>Open {diagramLabel}</span>
+          </a>
+
+          <button
+            type="button"
+            class="ui-panel-action js-only"
+            popovertarget={popoverId}
+            popovertargetaction="show"
+            aria-label="Expand diagram"
+            aria-haspopup="dialog"
+          >
+            <svg
+              viewBox="0 0 16 16"
+              width="13"
+              height="13"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <polyline points="1,5 1,1 5,1" />
+              <polyline points="11,1 15,1 15,5" />
+              <polyline points="15,11 15,15 11,15" />
+              <polyline points="5,15 1,15 1,11" />
+            </svg>
+            <span>Expand</span>
+          </button>
+        </div>
+
+        <div
+          id={popoverId}
+          popover="auto"
+          role="dialog"
+          aria-labelledby={popoverTitleId}
+          class="diagram-popover"
+        >
+          <div class="ui-panel-inner">
+            <div class="ui-panel-header">
+              <span id={popoverTitleId} class="ui-panel-title">
+                {diagramLabel}
+              </span>
+              <button
+                type="button"
+                class="btn btn-ghost btn-sm btn-circle"
+                popovertarget={popoverId}
+                popovertargetaction="hide"
+                aria-label="Close diagram"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  aria-hidden="true"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+
+            <div class={popoverScrollClass}>
+              {/* Filled at runtime: the shell clones the reading-view figure
+                  here on open (with namespaced ids) so only one SVG ships. */}
+              <div
+                class={className}
+                {...rest}
+                data-diagram-popover-content
+              />
+            </div>
+          </div>
+        </div>
+      </mermaid-diagram-shell>
+    ) : (
+      <div class="mermaid-error not-prose">Failed to render Mermaid diagram.</div>
+    )
+  ) : (
+    <div class={className} {...rest}>
+      <slot />
+    </div>
+  )
+}
+
+<script>
+  import "../../runtime/mermaid-diagram-shell.ts";
+</script>

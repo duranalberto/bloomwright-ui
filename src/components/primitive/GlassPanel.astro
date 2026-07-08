@@ -1,0 +1,25 @@
+---
+interface Props {
+  as?: keyof HTMLElementTagNameMap;
+  interactive?: boolean;
+  class?: string;
+}
+
+const props: Props = Astro.props;
+
+const {
+  as: Tag = "div",
+  interactive = true,
+  class: className,
+} = props;
+---
+
+<Tag
+  class:list={[
+    "glass-surface rounded-3xl shadow-2xl",
+    interactive && "glass-interactive",
+    className,
+  ]}
+>
+  <slot />
+</Tag>

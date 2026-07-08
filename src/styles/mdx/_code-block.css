@@ -1,0 +1,92 @@
+/* =========================================================
+   CODE BLOCK / SYNTAX HIGHLIGHTING
+   Styles for DaisyUI mockup-code combined with Shiki output.
+   Line numbers are injected via a Shiki transformer in the
+   consumer's config (data-line attribute on each line).
+   ========================================================= */
+
+.mockup-code {
+  position: relative;
+  overflow: hidden;
+}
+
+.mockup-code .line {
+  display: block !important;
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+  padding-left: 3.5rem !important;
+  padding-right: 1.25rem !important;
+  text-indent: -3.5rem !important;
+  line-height: 1.5 !important;
+}
+
+.mockup-code .line::before {
+  content: attr(data-line) !important;
+  display: inline-block !important;
+  width: 3.5rem !important;
+  min-width: 3.5rem !important;
+  padding-right: 1.25rem !important;
+  text-align: right !important;
+  font-size: 0.95em !important;
+  vertical-align: top !important;
+  user-select: none;
+  opacity: 0.4;
+  color: var(--color-base-content) !important;
+}
+
+.mockup-code pre,
+.mockup-code code {
+  background: transparent !important;
+  padding: 0 !important;
+  border: none !important;
+  line-height: inherit !important;
+}
+
+.mockup-code pre {
+  margin: 0 !important;
+  white-space: normal !important;
+}
+
+.mockup-code code {
+  display: block;
+}
+
+.mockup-code code::before,
+.mockup-code code::after {
+  content: none !important;
+}
+
+[data-theme="light"] .mockup-code {
+  background-color: var(--color-base-200) !important;
+  border-color: var(--color-base-300) !important;
+  color: var(--color-base-content);
+}
+
+[data-theme="light"] .mockup-code::before {
+  content: "";
+  opacity: 1 !important;
+  box-shadow:
+    1.2em 0 0 rgb(var(--shadow-color-base) / 0.1),
+    2.8em 0 0 rgb(var(--shadow-color-base) / 0.1),
+    4.4em 0 0 rgb(var(--shadow-color-base) / 0.1) !important;
+}
+
+[data-theme="dark"] .mockup-code {
+  background-color: var(--color-base-100) !important;
+  border-color: var(--color-base-200) !important;
+  color: var(--color-base-content);
+}
+
+[data-theme="dark"] .mockup-code span {
+  color: var(--shiki-dark) !important;
+  font-style: var(--shiki-dark-font-style) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
+[data-theme="dark"] .mockup-code::before {
+  opacity: 1 !important;
+  box-shadow:
+    1.2em 0 0 rgba(160, 160, 160, 0.35),
+    2.8em 0 0 rgba(160, 160, 160, 0.35),
+    4.4em 0 0 rgba(160, 160, 160, 0.35) !important;
+}

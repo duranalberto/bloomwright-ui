@@ -1,0 +1,77 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import {
+  chatBubbleColorClass,
+  type ChatBubbleColor,
+} from "../../logic/chat.ts";
+
+export type { ChatBubbleColor } from "../../logic/chat.ts";
+
+export interface Props extends HTMLAttributes<"article"> {
+  align?: "start" | "end";
+  color?: ChatBubbleColor;
+  imageClass?: string;
+  headerClass?: string;
+  bubbleClass?: string;
+  footerClass?: string;
+}
+
+const {
+  align = "start",
+  color,
+  imageClass,
+  headerClass,
+  bubbleClass,
+  footerClass,
+  class: className,
+  ...articleAttributes
+} = Astro.props;
+
+const hasImage = Astro.slots.has("image");
+const hasHeader = Astro.slots.has("header");
+const hasFooter = Astro.slots.has("footer");
+const colorClass = chatBubbleColorClass(color);
+---
+
+<article
+  {...articleAttributes}
+  class:list={[
+    "chat chat-message not-prose",
+    align === "end" ? "chat-end" : "chat-start",
+    className,
+  ]}
+>
+  {
+    hasImage && (
+      <div class:list={["chat-image chat-message-image", imageClass]}>
+        <slot name="image" />
+      </div>
+    )
+  }
+
+  {
+    hasHeader && (
+      <header class:list={["chat-header chat-message-header", headerClass]}>
+        <slot name="header" />
+      </header>
+    )
+  }
+
+  <div
+    class:list={[
+      "chat-bubble chat-message-bubble",
+      colorClass,
+      bubbleClass,
+    ]}
+  >
+    <slot />
+  </div>
+
+  {
+    hasFooter && (
+      <footer class:list={["chat-footer chat-message-footer", footerClass]}>
+        <slot name="footer" />
+      </footer>
+    )
+  }
+</article>

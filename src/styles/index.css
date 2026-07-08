@@ -1,0 +1,46 @@
+/* =========================================================
+   bloomwright-ui — component stylesheet entry point.
+
+   Import ONCE from a consumer's root layout AFTER Tailwind + DaisyUI and the
+   consumer's own theme tokens:
+
+     @import "tailwindcss";
+     @plugin "daisyui" { themes: light, dark; }   // + include list, see daisyui-preset.css
+     @source "../node_modules/bloomwright-ui/src";  // let Tailwind scan our classes
+     @import "bloomwright-ui/styles.css";
+
+   These partials are written against DaisyUI semantic classes (bg-base-100,
+   text-base-content, btn-primary, …) so they inherit the consumer's theme.
+   bloomwright-ui ships NO brand colors.
+
+   A handful of partials reference optional design tokens the consumer may
+   define (--font-display, --font-reading, --font-sans, --font-mono,
+   --radius-box, --radius-field, --border, --shadow-color-base, --safe-area-*).
+   They degrade gracefully when a token is absent.
+   ========================================================= */
+
+/* ── primitives ──────────────────────────────────────────── */
+@import "./primitive/_panel.css";
+@import "./primitive/_glass.css";
+
+/* ── display ─────────────────────────────────────────────── */
+@import "./display/_callout.css";
+@import "./display/_chat.css";
+@import "./display/_list.css";
+@import "./display/_steps.css";
+@import "./display/_mockup-window.css";
+@import "./display/_mockup-phone.css";
+@import "./display/_mockup-browser.css";
+@import "./display/_mockup-media.css";
+
+/* ── prose / mdx surfaces ────────────────────────────────── */
+@import "./mdx/_code-block.css";
+@import "./mdx/_prose-table.css";
+@import "./mdx/_heading-anchor.css";
+
+/* ── render (echarts / mermaid) ──────────────────────────── */
+@import "./render/_echart.css";
+@import "./render/_mermaid-diagram.css";
+
+/* ── shared ──────────────────────────────────────────────── */
+@import "./shared/_daisyui-overrides.css";

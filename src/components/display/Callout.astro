@@ -1,0 +1,62 @@
+---
+import type { Icon } from "../../types/icon.ts";
+import SVGIcon from "../primitive/SVGIcon.astro";
+import type { HTMLAttributes } from "astro/types";
+import {
+  resolveCallout,
+  type CalloutPalette,
+  type CalloutVariant,
+} from "../../logic/callout.ts";
+
+export type { CalloutPalette, CalloutVariant } from "../../logic/callout.ts";
+
+export interface Props extends Omit<HTMLAttributes<"aside">, "style"> {
+  variant?: CalloutVariant;
+  title?: string;
+  icon?: Icon;
+  palette?: Partial<CalloutPalette>;
+  headerClass?: string;
+  iconClass?: string;
+  titleClass?: string;
+  contentClass?: string;
+}
+
+const {
+  variant = "note",
+  title,
+  icon,
+  palette,
+  headerClass,
+  iconClass,
+  titleClass,
+  contentClass,
+  class: className,
+  ...asideAttributes
+} = Astro.props;
+
+const resolved = resolveCallout(variant, title, icon, palette);
+---
+
+<aside
+  {...asideAttributes}
+  data-callout-variant={resolved.variant}
+  style={resolved.paletteStyle}
+  class:list={[
+    "card callout-card not-prose shadow-sm",
+    resolved.className,
+    className,
+  ]}
+>
+  <div class:list={["callout-header", headerClass]}>
+    <span class:list={["callout-icon", iconClass]} aria-hidden="true">
+      <SVGIcon icon={resolved.icon} label="" width={20} height={20} />
+    </span>
+    <strong class:list={["callout-title", titleClass]}>
+      {resolved.title}
+    </strong>
+  </div>
+
+  <div class:list={["callout-content", contentClass]}>
+    <slot />
+  </div>
+</aside>

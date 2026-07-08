@@ -1,0 +1,45 @@
+/* =========================================================
+   STEPS
+   Accessible, data-driven DaisyUI progress sequences.
+   ========================================================= */
+
+@layer components {
+  .steps-component {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    padding: 0.25rem;
+    color: var(--color-base-content);
+    font-family: var(--font-sans);
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-base-300) transparent;
+  }
+
+  .steps-component:focus-visible {
+    border-radius: var(--radius-field);
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  .steps-component .step {
+    padding-inline: 0.5rem;
+    overflow-wrap: anywhere;
+    color: color-mix(in oklab, var(--color-base-content) 78%, transparent);
+    font-size: 0.875rem;
+    line-height: 1.35;
+  }
+
+  .steps-component .step[aria-current="step"] {
+    color: var(--color-base-content);
+    font-weight: 700;
+  }
+}
+
+@media (min-width: theme(--breakpoint-sm)) {
+  @layer components {
+    .steps-component.steps-horizontal .step,
+    .steps-component.sm\:steps-horizontal .step {
+      min-width: 7rem;
+    }
+  }
+}

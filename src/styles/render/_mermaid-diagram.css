@@ -1,0 +1,247 @@
+/* =========================================================
+   MERMAID DIAGRAM RENDERING
+   Styles for .mermaid-diagram-container / .diagram-wrapper wrapping the
+   pre-rendered inline SVG assets emitted by bloomwright-ui/mermaid and the
+   <mermaid-diagram-shell> reading-view + expand popover. Uses the shared
+   .ui-panel-* classes from primitive/_panel.css.
+   ========================================================= */
+
+.mermaid-diagram-container {
+  display: block;
+  width: 100%;
+  overflow: auto;
+  overscroll-behavior-x: contain;
+}
+
+/* `.mermaid-diagram-image` is the sizing box; the inline `<svg>` fills it and
+   its `preserveAspectRatio` keeps the diagram undistorted (centred, letterboxed
+   when the box ratio differs, e.g. under the reading-view height cap). The
+   explicit `aspect-ratio` (stamped inline) gives the box a definite height so
+   the SVG's `height: 100%` resolves. A single multi-theme SVG follows the page
+   theme, so no separate light/dark elements are needed. */
+.mermaid-diagram-image {
+  display: block;
+  width: 100% !important;
+  min-width: 100%;
+  height: auto !important;
+  max-width: none !important;
+}
+
+.mermaid-diagram-image > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+
+/* Force the inlined diagram to display in the SAME font metrics its label boxes
+   were measured with, instead of the page's UI font.
+
+   The render service sizes every htmlLabel `<foreignObject>` box from a live
+   getBoundingClientRect() and bakes the pixel width into the SVG (with
+   `white-space: nowrap`, so labels can neither wrap nor shrink). The page's
+   webfont is not installed on that service, so the boxes are measured with its
+   fallback sans-serif — Arial/Liberation metrics — even though the SVG's own
+   `<style>` may declare a different family. Opened standalone the asset looks
+   correct: the webfont isn't loaded there either, so labels fall back to Arial
+   and fit. But a page that loads the webfont resolves the inlined SVG's `.label`
+   to the (wider) real font and every nowrap label overflows its Arial-sized box
+   and clips. Overriding the family back to an Arial-class stack makes the
+   on-page rendering match the box measurements exactly — the same result the
+   standalone SVG shows — without re-rendering any asset. `!important` beats the
+   SVG's embedded `#mermaid-… .label` rule (higher specificity, but normal
+   importance); the spacing resets stop article body typography from leaking
+   into the foreignObject HTML and shifting the same metrics. Applies to the
+   reading-view figure and the popover clone (both carry this class). */
+.mermaid-diagram-image svg,
+.mermaid-diagram-image svg text,
+.mermaid-diagram-image svg tspan,
+.mermaid-diagram-image svg foreignObject *,
+.mermaid-diagram-image svg .label {
+  font-family: Arial, "Helvetica Neue", Helvetica, "Liberation Sans", sans-serif !important;
+}
+
+.mermaid-diagram-image svg foreignObject * {
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+}
+
+.mermaid-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: var(--border) solid var(--color-error);
+  background-color: color-mix(in oklab, var(--color-error) 10%, transparent);
+  color: var(--color-error);
+  padding: 1rem;
+  border-radius: var(--radius-box);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.875rem;
+  margin: 2rem 0;
+  min-height: 3rem;
+}
+
+.diagram-wrapper {
+  display: block;
+  margin-block: 2rem;
+  border-radius: var(--radius-box);
+  border: var(--border) solid
+    color-mix(in oklab, var(--color-base-content) 10%, transparent);
+  overflow: hidden;
+  background-color: var(--color-base-100);
+}
+
+.diagram-wrapper > .mermaid-diagram-container {
+  padding: 1.25rem 1rem 1rem;
+  border-bottom: var(--border) solid
+    color-mix(in oklab, var(--color-base-content) 8%, transparent);
+}
+
+/* Cap the reading-view height of very tall diagrams so they don't run away
+   vertically and force the reader to scroll past a wall of diagram. `width` is
+   derived from the cap and the diagram's own aspect ratio (`--diagram-ar`, from
+   MermaidDiagramWrapper.astro) so the box shrinks proportionally instead of the
+   `width: 100% !important` / `min-width: 100%` above stretching it — a bare
+   `max-height` without a matching width change breaks the box's aspect ratio
+   and non-uniformly stretches the inline SVG (it has no `preserveAspectRatio`
+   to fall back on); `min-width: 100%` alone would otherwise floor the
+   narrower width right back up to full container width. The Expand button
+   still opens the diagram at full size. */
+.diagram-wrapper > .mermaid-diagram-container > .mermaid-diagram-image {
+  max-height: min(75vh, 42rem);
+  width: min(100%, calc(min(75vh, 42rem) * var(--diagram-ar, 1))) !important;
+  min-width: 0;
+  margin-inline: auto;
+}
+
+.diagram-popover {
+  margin: auto;
+  padding: 0;
+  border: none;
+  width: min(95vw, 1400px);
+  height: min(90dvh, 900px);
+  height: min(calc(90dvh - var(--safe-area-bottom)), 900px);
+  background-color: var(--color-base-100);
+  border-radius: var(--radius-box);
+  border: var(--border) solid
+    color-mix(in oklab, var(--color-base-content) 10%, transparent);
+  box-shadow:
+    0 25px 50px -12px rgb(var(--shadow-color-base) / 0.4),
+    0 0 0 1px color-mix(in oklab, var(--color-base-content) 6%, transparent);
+  overflow: hidden;
+  transform-origin: center center;
+}
+
+.diagram-popover::backdrop {
+  background-color: rgb(var(--shadow-color-base) / 0.5);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+@starting-style {
+  .diagram-popover:popover-open {
+    opacity: 0;
+    scale: 0.97;
+  }
+}
+
+.diagram-popover:popover-open {
+  opacity: 1;
+  scale: 1;
+  transition:
+    opacity 0.2s ease,
+    scale 0.2s ease,
+    display 0.2s ease allow-discrete,
+    overlay 0.2s ease allow-discrete;
+}
+
+.diagram-popover-scroll {
+  touch-action: pan-x pan-y;
+  padding: 1.5rem;
+  padding-bottom: max(1.5rem, var(--safe-area-bottom));
+}
+
+/* Expanded view: the whole point of expanding is to read the diagram at full
+   detail, so a mid-ratio diagram renders at its TRUE (natural) pixel size
+   (`--diagram-w`, stamped inline from the SVG viewBox) and the popover scrolls
+   in both axes when it exceeds the viewport — never shrinking it to fit, which
+   made diagrams illegible on small screens. `align-items`/`justify-content:
+   safe center` centres the image when it fits but falls back to start-alignment
+   when it overflows, so every edge stays reachable while scrolling.
+
+   Off-ratio diagrams (`.is-wide` / `.is-tall`) keep their bespoke rules: they
+   upscale to fill their deficient dimension, bounded so the overflow never
+   exceeds N× the container in that axis. `--diagram-ar` (numeric aspect ratio)
+   feeds the calc; container-query units give it the live popover size, which
+   `container-type: size` makes resolvable here. */
+.diagram-popover-scroll {
+  --diagram-pan-cap: 2; /* wide: image width <= N x popover width */
+  --diagram-scroll-cap: 2; /* tall: image height <= N x popover height */
+  container-type: size;
+  display: flex;
+  align-items: safe center;
+  justify-content: safe center;
+}
+
+.diagram-popover-scroll .mermaid-diagram-container {
+  display: contents;
+}
+
+.diagram-popover-scroll .mermaid-diagram-image {
+  flex: none;
+  width: var(--diagram-w, 100%) !important;
+  height: auto !important;
+  min-width: 0;
+  max-width: none !important;
+  max-height: none;
+}
+
+/* Very wide diagrams: upscale to fill the popover height, but clamp the height
+   so the resulting width stays within `--diagram-pan-cap` x the popover width,
+   then pan horizontally. `justify-content: flex-start` keeps the left edge
+   reachable while scrolling (centred overflow would clip it). */
+.diagram-popover-scroll.is-wide {
+  justify-content: flex-start;
+}
+
+.diagram-popover-scroll.is-wide .mermaid-diagram-image {
+  width: auto !important;
+  height: min(
+    100%,
+    calc(var(--diagram-pan-cap) * 100cqw / var(--diagram-ar))
+  ) !important;
+  max-width: none !important;
+  max-height: none;
+}
+
+/* Very tall diagrams: upscale to fill the popover width, but clamp the width so
+   the resulting height stays within `--diagram-scroll-cap` x the popover
+   height, then scroll vertically. `align-items: flex-start` keeps the top edge
+   reachable while scrolling. */
+.diagram-popover-scroll.is-tall {
+  align-items: flex-start;
+}
+
+.diagram-popover-scroll.is-tall .mermaid-diagram-image {
+  width: min(
+    100%,
+    calc(var(--diagram-scroll-cap) * 100cqh * var(--diagram-ar))
+  ) !important;
+  height: auto !important;
+  max-width: none !important;
+  max-height: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diagram-popover:popover-open {
+    transition: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .diagram-wrapper,
+  .diagram-popover .ui-panel-header,
+  .diagram-popover {
+    border-width: 2px;
+  }
+}

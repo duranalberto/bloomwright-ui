@@ -1,0 +1,44 @@
+---
+import type { Icon } from "../../types/icon.ts";
+
+interface Props {
+  id?: string;
+  icon: Icon;
+  class?: string;
+  width?: number | string;
+  height?: number | string;
+  stroke?: string;
+  label?: string;
+  strokeWidth?: number | string;
+}
+
+const { id, icon, class: className, label, ...overrides } = Astro.props;
+const width = overrides.width ?? icon.width ?? 24;
+const height = overrides.height ?? icon.height ?? 24;
+const stroke = overrides.stroke ?? icon.stroke ?? "none";
+const strokeWidth = overrides.strokeWidth ?? icon.strokeWidth ?? 0;
+const fill = icon.fill ?? "currentColor";
+const strokeLinecap = icon.strokeLinecap ?? "round";
+const strokeLinejoin = icon.strokeLinejoin ?? "round";
+const text = label ?? icon.text;
+const ariaHidden = text ? undefined : true;
+---
+
+<svg
+  id={id}
+  class:list={["select-none", className]}
+  viewBox={icon.viewBox}
+  width={width}
+  height={height}
+  fill={fill}
+  stroke={stroke}
+  stroke-width={strokeWidth}
+  stroke-linecap={strokeLinecap}
+  stroke-linejoin={strokeLinejoin}
+  xmlns="http://www.w3.org/2000/svg"
+  role={text ? "img" : undefined}
+  aria-hidden={ariaHidden}
+>
+  {text && <title>{text}</title>}
+  <Fragment set:html={icon.content} />
+</svg>

@@ -1,0 +1,68 @@
+/* =========================================================
+   GLASS SURFACE (GlassPanel)
+   Glassmorphism surface. Requires both -webkit-backdrop-filter
+   and backdrop-filter for Safari/WebKit compatibility.
+   ========================================================= */
+
+.glass-surface {
+  --glass-border-opacity: 0.15;
+  --glass-bg-opacity: 0.4;
+
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border: var(--border) solid rgba(128, 128, 128, 0.15);
+  border: var(--border) solid
+    color-mix(
+      in srgb,
+      var(--color-base-content, currentColor),
+      transparent calc(100% - (var(--glass-border-opacity) * 100%))
+    );
+
+  background-color: var(--glass-bg-fallback);
+  background-color: color-mix(
+    in srgb,
+    var(--color-base-200),
+    transparent calc(100% - (var(--glass-bg-opacity) * 100%))
+  );
+
+  background-image: none !important;
+
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+
+  transition:
+    transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 0.4s ease;
+}
+
+[data-theme="dark"] .glass-surface {
+  --glass-border-opacity: 0.1;
+  --glass-bg-opacity: 0.25;
+  background-color: var(--glass-bg-fallback);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .glass-interactive:hover {
+    will-change: transform, box-shadow;
+    transform: translateY(-6px);
+    box-shadow:
+      0 20px 40px -10px rgb(var(--shadow-color-base) / 0.25),
+      0 0 0 1px color-mix(in srgb, var(--color-primary), transparent 85%);
+  }
+
+  .glass-interactive:not(:hover) {
+    will-change: auto;
+  }
+}
+
+@media (pointer: coarse) {
+  .glass-interactive:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+}
+
+.glass-surface :where(div, span, section) {
+  border-color: inherit;
+}

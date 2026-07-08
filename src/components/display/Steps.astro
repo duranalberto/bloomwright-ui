@@ -1,0 +1,61 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import {
+  resolveStepItems,
+  type StepColor,
+  type StepItem,
+} from "../../logic/steps.ts";
+
+export type { StepColor, StepItem } from "../../logic/steps.ts";
+
+export interface Props extends HTMLAttributes<"ol"> {
+  items: StepItem[];
+  currentStep?: number;
+  activeColor?: StepColor;
+  orientation?: "responsive" | "horizontal" | "vertical";
+  itemClass?: string;
+}
+
+const {
+  items,
+  currentStep,
+  activeColor = "primary",
+  orientation = "responsive",
+  itemClass,
+  class: className,
+  tabindex,
+  ...listAttributes
+} = Astro.props;
+
+const orientationClasses = {
+  responsive: "steps-vertical sm:steps-horizontal",
+  horizontal: "steps-horizontal",
+  vertical: "steps-vertical",
+} as const;
+
+const resolvedItems = resolveStepItems(items, currentStep, activeColor);
+const canOverflowHorizontally = orientation !== "vertical";
+const listTabIndex = tabindex ?? (canOverflowHorizontally ? 0 : undefined);
+---
+
+<ol
+  {...listAttributes}
+  tabindex={listTabIndex}
+  class:list={[
+    "steps steps-component not-prose",
+    orientationClasses[orientation],
+    className,
+  ]}
+>
+  {
+    resolvedItems.map((item) => (
+      <li
+        class:list={["step", item.colorClass, itemClass, item.class]}
+        data-content={item.marker}
+        aria-current={item.isCurrent ? "step" : undefined}
+      >
+        {item.label}
+      </li>
+    ))
+  }
+</ol>

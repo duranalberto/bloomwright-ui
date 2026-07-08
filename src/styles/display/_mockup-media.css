@@ -1,0 +1,13 @@
+/* =========================================================
+   MOCKUP MEDIA
+   Direct screenshots are static presentation, not draggable UI.
+   ========================================================= */
+
+@layer components {
+  .mockup-static-media > :where(img, picture),
+  .mockup-static-media > picture img {
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+}

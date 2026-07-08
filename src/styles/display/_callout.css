@@ -1,0 +1,148 @@
+/* =========================================================
+   CALLOUT
+   Theme-aware publication notes with typed semantic variants.
+   ========================================================= */
+
+@layer components {
+  .callout-card {
+    --callout-accent: var(--color-primary);
+    --callout-surface: color-mix(
+      in oklab,
+      var(--callout-accent) 10%,
+      var(--color-base-100)
+    );
+    --callout-border: color-mix(
+      in oklab,
+      var(--callout-accent) 42%,
+      var(--color-base-300)
+    );
+    --callout-title: var(--color-base-content);
+    --callout-content: color-mix(
+      in oklab,
+      var(--color-base-content) 84%,
+      transparent
+    );
+    --callout-icon: var(--callout-accent);
+    --callout-icon-surface: color-mix(
+      in oklab,
+      var(--callout-accent) 18%,
+      var(--color-base-100)
+    );
+
+    width: 100%;
+    height: fit-content;
+    min-width: 0;
+    align-self: start;
+    margin-block: 0;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    overflow: hidden;
+    color: var(--callout-content);
+    background-color: var(--callout-surface);
+    border: 1px solid var(--callout-border);
+    border-inline-start: 0.25rem solid var(--callout-accent);
+    border-radius: var(--radius-box);
+    font-family: var(--font-reading);
+  }
+
+  .callout-information {
+    --callout-accent: var(--color-info);
+  }
+
+  .callout-warning {
+    --callout-accent: var(--color-warning);
+  }
+
+  .callout-caution {
+    --callout-accent: var(--color-secondary);
+  }
+
+  .callout-error {
+    --callout-accent: var(--color-error);
+  }
+
+  .callout-header {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .callout-icon {
+    display: grid;
+    width: 2rem;
+    height: 2rem;
+    flex: none;
+    place-items: center;
+    color: var(--callout-icon);
+    background-color: var(--callout-icon-surface);
+    border-radius: calc(var(--radius-field) * 1.5);
+  }
+
+  .callout-title {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: var(--callout-title);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .callout-content {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: var(--callout-content);
+    font-size: 0.9375rem;
+    line-height: 1.65;
+  }
+
+  .callout-content > :first-child {
+    margin-block-start: 0;
+  }
+
+  .callout-content > :last-child {
+    margin-block-end: 0;
+  }
+
+  .callout-content :where(p, ul, ol, pre, blockquote) {
+    margin-block: 0.75rem;
+  }
+
+  .callout-content :where(ul, ol) {
+    padding-inline-start: 1.25rem;
+  }
+
+  .callout-content ul {
+    list-style: disc;
+  }
+
+  .callout-content ol {
+    list-style: decimal;
+  }
+
+  .callout-content :where(a) {
+    color: var(--callout-title);
+    text-decoration-line: underline;
+    text-decoration-color: var(--callout-accent);
+    text-underline-offset: 0.2em;
+  }
+
+  .callout-content :where(code) {
+    overflow-wrap: anywhere;
+    color: var(--callout-title);
+    font-family: var(--font-mono);
+  }
+
+  .callout-content :where(pre) {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 30rem) {
+  @layer components {
+    .callout-card {
+      padding: 1rem;
+    }
+  }
+}

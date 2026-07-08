@@ -1,0 +1,17 @@
+---
+// ProseTable.astro
+// MDX table override — DaisyUI 5 table styled to match prose aesthetics.
+// The scroll wrapper activates only when table content exceeds the container.
+// tabindex="0" allows keyboard users to scroll the region (WCAG 2.1 SC 2.1.1).
+---
+
+<figure
+  class="prose-table-wrapper not-prose"
+  role="region"
+  aria-label="Data table"
+  tabindex="0"
+>
+  <table class="table">
+    <slot />
+  </table>
+</figure>

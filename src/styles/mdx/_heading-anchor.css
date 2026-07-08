@@ -1,0 +1,71 @@
+/* =========================================================
+   HEADING ANCHOR
+   Copy-link affordance revealed on heading hover/focus.
+   ========================================================= */
+
+.anchor-trigger {
+  opacity: 1;
+  position: relative;
+}
+
+@media (min-width: theme(--breakpoint-lg)) {
+  .anchor-trigger[data-state="idle"] {
+    opacity: 0;
+    transition:
+      opacity 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .group:hover .anchor-trigger[data-state="idle"],
+  .anchor-trigger[data-state="idle"]:focus-visible {
+    opacity: 1;
+  }
+}
+
+.anchor-trigger[data-state="copied"] {
+  opacity: 1 !important;
+  transition:
+    opacity 0.2s ease,
+    color 0.2s ease;
+}
+
+.anchor-icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+}
+
+.anchor-trigger[data-state="idle"] .anchor-icon-link {
+  opacity: 1;
+  transform: scale(1);
+}
+.anchor-trigger[data-state="idle"] .anchor-icon-check {
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+.anchor-trigger[data-state="copied"] .anchor-icon-link {
+  opacity: 0;
+  transform: scale(0.6);
+}
+.anchor-trigger[data-state="copied"] .anchor-icon-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anchor-icon {
+    transition: opacity 0.15s ease;
+  }
+  .anchor-trigger[data-state="idle"] .anchor-icon-link,
+  .anchor-trigger[data-state="idle"] .anchor-icon-check,
+  .anchor-trigger[data-state="copied"] .anchor-icon-link,
+  .anchor-trigger[data-state="copied"] .anchor-icon-check {
+    transform: none;
+  }
+}

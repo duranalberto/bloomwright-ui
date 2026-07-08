@@ -1,0 +1,70 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+export interface Props extends HTMLAttributes<"figure"> {
+  windowClass?: string;
+  contentClass?: string;
+  headerClass?: string;
+  bodyClass?: string;
+  captionClass?: string;
+}
+
+const {
+  class: className,
+  windowClass,
+  contentClass,
+  headerClass,
+  bodyClass,
+  captionClass,
+  ...figureAttributes
+} = Astro.props;
+
+const hasHeader = Astro.slots.has("header");
+const hasCaption = Astro.slots.has("caption");
+---
+
+<figure
+  {...figureAttributes}
+  class:list={["mockup-window-figure not-prose", className]}
+>
+  <div
+    class:list={[
+      "mockup-window mockup-window-frame border border-base-300 bg-base-200 text-base-content",
+      windowClass,
+    ]}
+  >
+    <div
+      class:list={[
+        "mockup-window-content border-t border-base-300 bg-base-100",
+        contentClass,
+      ]}
+    >
+      {
+        hasHeader && (
+          <header
+            class:list={[
+              "mockup-window-header border-b border-base-300",
+              headerClass,
+            ]}
+          >
+            <slot name="header" />
+          </header>
+        )
+      }
+
+      <div class:list={["mockup-window-body mockup-static-media", bodyClass]}>
+        <slot />
+      </div>
+    </div>
+  </div>
+
+  {
+    hasCaption && (
+      <figcaption
+        class:list={["mockup-window-caption text-base-content/70", captionClass]}
+      >
+        <slot name="caption" />
+      </figcaption>
+    )
+  }
+</figure>

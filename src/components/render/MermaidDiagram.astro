@@ -1,0 +1,52 @@
+---
+import { resolvePreparedMermaidDiagram } from "../../mermaid/build-context.ts";
+import type { MermaidDiagramDefinition } from "../../mermaid/definition.ts";
+import { serializeMermaidNode } from "../../mermaid/fence-html.ts";
+import type { RegisteredDiagram } from "../../mermaid/pipeline.ts";
+import type { DiagramCacheStore } from "../../shared/cache.ts";
+import MermaidDiagramWrapper from "./MermaidDiagramWrapper.astro";
+
+export interface Props {
+  code: MermaidDiagramDefinition | string;
+  class?: string;
+  /**
+   * Cache-store coherence for a non-default backend (SPEC §4.7). During static
+   * prerender this component runs in a fresh module instance that cannot see the
+   * build's in-memory registry, so it reads the prepared diagram from the
+   * manifest store. If you passed a custom `mermaid.cache` factory to
+   * bloomwrightMdx(), pass the SAME manifest store here so the lookup resolves;
+   * omit it to use the built-in disk manifest (the zero-config default).
+   */
+  store?: DiagramCacheStore<RegisteredDiagram>;
+}
+
+const { code, class: className, store } = Astro.props;
+const { stableId, diagramType, diagram } = resolvePreparedMermaidDiagram(
+  code,
+  store,
+);
+const wrapperClass = ["mermaid-diagram-container", className]
+  .filter(Boolean)
+  .join(" ");
+
+// Serialize the resolved SVG for the wrapper (base64 keeps it opaque to the
+// attribute serializer; the wrapper decodes it and renders it with set:html).
+// This is the same inline SVG the fence `.md` path produces, so hand-written
+// and fence-generated diagrams render identically.
+const { svgHtml, dims } = serializeMermaidNode(diagram);
+const diagramSvgB64 = svgHtml
+  ? Buffer.from(svgHtml, "utf8").toString("base64")
+  : undefined;
+---
+
+<MermaidDiagramWrapper
+  class={wrapperClass}
+  data-diagram-src={diagram.assetHref}
+  data-diagram-dark-src={diagram.assetHrefDark}
+  data-diagram-stable-id={stableId}
+  data-diagram-cache-key={diagram.cacheKey}
+  data-diagram-type={diagramType}
+  data-diagram-svg={diagramSvgB64}
+  data-diagram-width={dims ? String(dims.width) : undefined}
+  data-diagram-height={dims ? String(dims.height) : undefined}
+/>

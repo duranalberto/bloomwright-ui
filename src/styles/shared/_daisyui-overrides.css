@@ -1,0 +1,11 @@
+/* =========================================================
+   DAISYUI COMPONENT OVERRIDES
+   Consumer-agnostic corrections to DaisyUI defaults shared across
+   bloomwright-ui components.
+
+   Intentionally minimal: the source project's only override targeted an
+   app-specific component (experience timeline) and does NOT belong in a
+   reusable leaf, so it was dropped during extraction (BUI-008). This file is
+   kept as the documented seam for future cross-component corrections and to
+   keep `index.css` free of dangling imports.
+   ========================================================= */

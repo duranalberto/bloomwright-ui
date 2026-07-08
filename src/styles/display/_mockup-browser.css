@@ -1,0 +1,58 @@
+/* =========================================================
+   MOCKUP BROWSER
+   Reusable DaisyUI browser frame for Astro pages and MDX.
+   ========================================================= */
+
+@layer components {
+  .mockup-browser-figure {
+    width: 100%;
+    min-width: 0;
+    margin-block: 2rem;
+  }
+
+  .mockup-browser-frame {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .mockup-browser-toolbar-region,
+  .mockup-browser-content {
+    min-width: 0;
+  }
+
+  .mockup-browser-address {
+    width: 100%;
+    min-width: 0;
+    cursor: text;
+  }
+
+  .mockup-browser-address-value {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mockup-browser-content {
+    overflow-x: auto;
+  }
+
+  .mockup-browser-caption {
+    margin-top: 0.75rem;
+    font-family: var(--font-reading);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    text-align: center;
+  }
+}
+
+@media (max-width: 30rem) {
+  @layer components {
+    .mockup-browser-toolbar-region {
+      padding-inline: 0.75rem;
+    }
+  }
+}

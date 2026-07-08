@@ -1,0 +1,112 @@
+---
+import { Image } from "astro:assets";
+import type { HTMLAttributes } from "astro/types";
+import { resolveListItems, type ListItem } from "../../logic/list.ts";
+
+export type {
+  ListAction,
+  ListItem,
+  ListItemMedia,
+  ListStatus,
+  ListStatusColor,
+} from "../../logic/list.ts";
+
+export interface Props extends HTMLAttributes<"ul"> {
+  items: ListItem[];
+  itemClass?: string;
+}
+
+const {
+  items,
+  itemClass,
+  class: className,
+  ...listAttributes
+} = Astro.props;
+
+const resolvedItems = resolveListItems(items);
+---
+
+<ul
+  {...listAttributes}
+  class:list={[
+    "list publication-list not-prose bg-base-100 border border-base-300 rounded-box",
+    className,
+  ]}
+>
+  {
+    resolvedItems.map((item) => (
+      <li class:list={["list-row publication-list-row", itemClass, item.class]}>
+        {item.href && (
+          <a
+            href={item.href}
+            aria-label={item.ariaLabel ?? `Read ${item.title}`}
+            class="publication-list-row-link"
+          />
+        )}
+        {item.media?.kind === "image" && (
+          <div class:list={["publication-list-media", item.media.class]}>
+            <Image src={item.media.src} alt={item.media.alt} loading="lazy" />
+          </div>
+        )}
+
+        {item.media?.kind === "marker" && (
+          <span
+            class:list={[
+              "publication-list-marker",
+              item.media.class,
+            ]}
+            aria-hidden="true"
+          >
+            {item.media.label}
+          </span>
+        )}
+
+        <div
+          class:list={[
+            "list-col-grow publication-list-content",
+            item.contentClass,
+          ]}
+        >
+          <div class="publication-list-title-line">
+            <strong class="publication-list-title">{item.title}</strong>
+            {item.status && (
+              <span
+                class:list={[
+                  "badge badge-sm publication-list-status",
+                  item.statusClass,
+                  item.status.class,
+                ]}
+              >
+                {item.status.label}
+              </span>
+            )}
+          </div>
+
+          {item.subtitle && (
+            <div class="publication-list-subtitle">{item.subtitle}</div>
+          )}
+        </div>
+
+        {item.description && (
+          <p class="list-col-wrap publication-list-description">
+            {item.description}
+          </p>
+        )}
+
+        {item.action && (
+          <a
+            href={item.action.href}
+            aria-label={item.action.ariaLabel}
+            {...item.actionAttributes}
+            class:list={[
+              "btn btn-sm btn-ghost publication-list-action",
+              item.action.class,
+            ]}
+          >
+            {item.action.label}
+          </a>
+        )}
+      </li>
+    ))
+  }
+</ul>

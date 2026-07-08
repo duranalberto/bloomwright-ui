@@ -1,0 +1,181 @@
+---
+import "../styles/app.css";
+
+// Import every public component through the package `exports` map — this is
+// the end-to-end consumption smoke test (BUI-010 / BUI-001 AC4).
+import Callout from "bloomwright-ui/components/display/Callout.astro";
+import ChatBubble from "bloomwright-ui/components/display/ChatBubble.astro";
+import List from "bloomwright-ui/components/display/List.astro";
+import Steps from "bloomwright-ui/components/display/Steps.astro";
+import MockupBrowser from "bloomwright-ui/components/display/MockupBrowser.astro";
+import MockupPhone from "bloomwright-ui/components/display/MockupPhone.astro";
+import MockupWindow from "bloomwright-ui/components/display/MockupWindow.astro";
+import SectionHeader from "bloomwright-ui/components/display/SectionHeader.astro";
+import SVGIcon from "bloomwright-ui/components/primitive/SVGIcon.astro";
+import Button from "bloomwright-ui/components/primitive/Button.astro";
+import GlassPanel from "bloomwright-ui/components/primitive/GlassPanel.astro";
+import OverlayPanel from "bloomwright-ui/components/primitive/OverlayPanel.astro";
+import CodeBlock from "bloomwright-ui/components/prose/CodeBlock.astro";
+import ProseTable from "bloomwright-ui/components/prose/ProseTable.astro";
+import HeadingAnchor from "bloomwright-ui/components/prose/HeadingAnchor.astro";
+import VideoPlayer from "bloomwright-ui/components/prose/VideoPlayer.astro";
+
+import type { Icon, StepItem, ListItem } from "bloomwright-ui";
+
+const boltIcon: Icon = {
+  text: "Bolt",
+  viewBox: "0 0 24 24",
+  content: '<path d="M13 2 3 14h8l-1 8 10-12h-8l1-6Z"/>',
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 2,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+};
+
+const steps: StepItem[] = [
+  { label: "Draft", marker: "1" },
+  { label: "Review", marker: "2" },
+  { label: "Publish", marker: "3" },
+];
+
+const listItems: ListItem[] = [
+  {
+    title: "Extraction strategy",
+    subtitle: "How the kit was split out",
+    media: { kind: "marker", label: "01" },
+    status: { label: "Shipped", color: "success" },
+    action: { label: "Read", href: "#", ariaLabel: "Read extraction strategy" },
+  },
+  {
+    title: "External reference",
+    subtitle: "Opens in a new tab",
+    media: { kind: "marker", label: "02" },
+    action: {
+      label: "Visit",
+      href: "https://example.com",
+      external: true,
+      ariaLabel: "Visit example",
+    },
+  },
+];
+---
+
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>bloomwright-ui — component gallery</title>
+  </head>
+  <body class="min-h-screen bg-base-100 text-base-content">
+    <main class="mx-auto flex max-w-4xl flex-col gap-16 p-8">
+      <header class="flex flex-col gap-2">
+        <h1 class="text-4xl font-bold">bloomwright-ui gallery</h1>
+        <p class="text-base-content/70">
+          Every shipped component, rendered under the app's own theme.
+        </p>
+      </header>
+
+      {
+        (["light", "dark"] as const).map((theme) => (
+          <section data-theme={theme} class="flex flex-col gap-10 rounded-box bg-base-100 p-6">
+            <SectionHeader
+              title={`Theme: ${theme}`}
+              id={`theme-${theme}`}
+              level={2}
+              linkHref="https://example.com"
+              linkLabel="Docs"
+              linkExternal={true}
+            />
+
+            {/* ── primitives ── */}
+            <div class="flex flex-wrap items-center gap-4">
+              <Button variant="btn-primary" size="btn-md" label="Primary" icon={boltIcon} />
+              <Button variant="btn-outline" size="btn-sm" label="Outline" />
+              <Button variant="btn-ghost" size="btn-lg" href="#top" label="Link button" />
+              <span class="text-primary">
+                <SVGIcon icon={boltIcon} width={28} height={28} />
+              </span>
+            </div>
+
+            <GlassPanel class="p-6">
+              <p class="font-medium">GlassPanel surface</p>
+            </GlassPanel>
+
+            {/* ── display ── */}
+            <Callout variant="note" title="Note callout">
+              A themed callout using the shared <code>resolveCallout</code> logic.
+            </Callout>
+            <Callout variant="warning" title="Warning callout">
+              Warning variant.
+            </Callout>
+
+            <ChatBubble align="start" color="primary">
+              <span slot="header">Ada</span>
+              Hello from a chat bubble.
+              <span slot="footer">delivered</span>
+            </ChatBubble>
+
+            <List items={listItems} />
+
+            <Steps items={steps} currentStep={2} activeColor="success" />
+
+            <MockupBrowser url="https://bloomwright.dev">
+              <div class="p-8 text-center">Browser mockup content</div>
+            </MockupBrowser>
+
+            <MockupWindow>
+              <span slot="header">Window title</span>
+              <div class="p-8 text-center">Window mockup content</div>
+            </MockupWindow>
+
+            <MockupPhone>
+              <div class="p-8 text-center">Phone mockup content</div>
+            </MockupPhone>
+
+            {/* ── prose surfaces ── */}
+            <div class="prose max-w-none">
+              <HeadingAnchor as="h2" id={`anchor-${theme}`}>
+                Anchored heading
+              </HeadingAnchor>
+              <CodeBlock>
+                <pre><code>const answer = 42;</code></pre>
+              </CodeBlock>
+              <ProseTable>
+                <thead>
+                  <tr><th>Component</th><th>Layer</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Callout</td><td>display</td></tr>
+                  <tr><td>Button</td><td>primitive</td></tr>
+                </tbody>
+              </ProseTable>
+            </div>
+
+            <VideoPlayer src="https://example.com/stream.m3u8" title="Sample stream" />
+
+            {/* ── overlay ── */}
+            <div>
+              <label
+                for={`overlay-${theme}`}
+                role="button"
+                tabindex="0"
+                aria-haspopup="dialog"
+                class="btn btn-secondary"
+              >
+                Open overlay
+              </label>
+              <OverlayPanel
+                toggleId={`overlay-${theme}`}
+                title="Overlay panel"
+                closeLabel="Close overlay"
+              >
+                <p class="p-2">Overlay panel body content.</p>
+              </OverlayPanel>
+            </div>
+          </section>
+        ))
+      }
+    </main>
+  </body>
+</html>

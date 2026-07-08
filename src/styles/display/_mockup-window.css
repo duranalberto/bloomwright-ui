@@ -1,0 +1,54 @@
+/* =========================================================
+   MOCKUP WINDOW
+   Reusable DaisyUI window frame for Astro pages and MDX.
+   ========================================================= */
+
+@layer components {
+  .mockup-window-figure {
+    width: 100%;
+    min-width: 0;
+    margin-block: 2rem;
+  }
+
+  .mockup-window-frame {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .mockup-window-content,
+  .mockup-window-body {
+    min-width: 0;
+  }
+
+  .mockup-window-header {
+    padding: 0.75rem 1rem;
+    font-family: var(--font-sans);
+    font-weight: 600;
+  }
+
+  .mockup-window-body {
+    overflow-x: auto;
+    padding: 1.5rem;
+  }
+
+  .mockup-window-caption {
+    margin-top: 0.75rem;
+    font-family: var(--font-reading);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    text-align: center;
+  }
+}
+
+@media (max-width: 30rem) {
+  @layer components {
+    .mockup-window-header {
+      padding-inline: 0.75rem;
+    }
+
+    .mockup-window-body {
+      padding: 1rem;
+    }
+  }
+}

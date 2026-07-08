@@ -1,0 +1,81 @@
+---
+import {
+  type ChartHydrationMode,
+  type ChartRenderMode,
+  type DeferredChartHydrationMode,
+  type DeferredChartRenderMode,
+} from "../../echarts/component.ts";
+import type { ChartClientPreset } from "../../echarts/client-presets.ts";
+import type { ChartOption, ChartTheme } from "../../echarts/registry.ts";
+import { renderEChartMarkup } from "../../echarts/markup.ts";
+
+export interface Props {
+  option: ChartOption;
+  width?: number;
+  height?: number;
+  render?: ChartRenderMode | DeferredChartRenderMode;
+  hydrate?: ChartHydrationMode | DeferredChartHydrationMode;
+  title?: string;
+  caption?: string;
+  description?: string;
+  class?: string;
+  id?: string;
+  enhance?: ChartHydrationMode;
+  media?: string;
+  theme?: ChartTheme;
+  aria?: Record<string, unknown>;
+  cacheKey?: string;
+  optionClientPreset?: ChartClientPreset;
+  clientOption?: ChartOption;
+}
+
+const {
+  option,
+  width = 760,
+  height = 420,
+  render,
+  hydrate,
+  title,
+  caption,
+  description,
+  class: className,
+  id,
+  enhance,
+  media,
+  theme,
+  aria,
+  cacheKey,
+  optionClientPreset,
+  clientOption,
+} = Astro.props;
+
+const rendered = renderEChartMarkup({
+  option,
+  width,
+  height,
+  render,
+  hydrate,
+  title,
+  caption,
+  description,
+  className,
+  id,
+  enhance,
+  media,
+  theme,
+  aria,
+  cacheKey,
+  optionClientPreset,
+  clientOption,
+});
+---
+
+<Fragment set:html={rendered.html} />
+
+{
+  rendered.shouldEnhance && (
+    <script>
+      import "../../runtime/echart-shell.ts";
+    </script>
+  )
+}

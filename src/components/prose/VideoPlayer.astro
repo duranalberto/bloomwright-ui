@@ -1,0 +1,76 @@
+---
+/**
+ * Pure HLS video player. The placeholder box reserves a full HD (1920x1080)
+ * aspect ratio up front so the layout doesn't shift once playback starts.
+ * hls.js and the enhancement script are declared here, not in a shared
+ * layout, so they only ship on pages that actually render this component.
+ */
+
+export interface Props {
+  src: string;
+  poster?: string;
+  title?: string;
+  class?: string;
+}
+
+const { src, poster, title = "Video player", class: className } =
+  Astro.props;
+
+const qualityId = `video-quality-${crypto.randomUUID().replace(/-/g, "").slice(0, 8)}`;
+---
+
+<video-player-shell
+  class:list={["video-player not-prose block", className]}
+  data-video-src={src}
+>
+  <div
+    class="w-full max-w-[1920px] overflow-hidden rounded-box bg-black"
+    style="aspect-ratio: 1920 / 1080;"
+  >
+    <video
+      data-video-player-el
+      controls
+      playsinline
+      preload="metadata"
+      crossorigin="anonymous"
+      poster={poster}
+      aria-label={title}
+      class="block h-full w-full bg-black object-contain"
+    ></video>
+  </div>
+
+  <div class="mt-3 flex items-start justify-between gap-3">
+    <div data-video-metadata hidden class="min-w-0 flex flex-col gap-1">
+      <p data-video-metadata-title hidden class="font-semibold text-base-content"></p>
+      <p
+        data-video-metadata-description
+        hidden
+        class="text-sm text-base-content/70"
+      ></p>
+      <div
+        data-video-metadata-tags
+        hidden
+        class="flex flex-wrap gap-x-3 text-sm text-base-content/50"
+      ></div>
+    </div>
+
+    <div data-video-quality-control class="flex shrink-0 items-center gap-2 text-sm">
+      <label for={qualityId} class="font-semibold text-base-content/70">
+        Quality
+      </label>
+      <select
+        id={qualityId}
+        data-video-player-quality
+        disabled
+        class="select select-sm w-40 rounded-btn border border-base-300 bg-base-100 px-2 text-sm disabled:text-base-content/50"
+      >
+        <option value="-1">Auto</option>
+      </select>
+    </div>
+  </div>
+</video-player-shell>
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js" is:inline></script>
+<script>
+  import "../../runtime/video-player-shell.ts";
+</script>

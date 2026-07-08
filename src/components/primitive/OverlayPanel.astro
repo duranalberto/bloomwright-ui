@@ -1,0 +1,116 @@
+---
+interface Props {
+  toggleId: string;
+  title?: string;
+  titleId?: string;
+  ariaLabel?: string;
+  ariaLabelledBy?: string;
+  closeLabel: string;
+  class?: string;
+  maxWidthClass?: string;
+  boxClass?: string;
+  scrollClass?: string;
+}
+
+const {
+  toggleId,
+  title,
+  titleId,
+  ariaLabel,
+  ariaLabelledBy,
+  closeLabel,
+  class: className,
+  maxWidthClass = "sm:max-w-sm",
+  boxClass,
+  scrollClass,
+} = Astro.props;
+
+const dialogId = `${toggleId}-dialog`;
+const hasTitle = !!title;
+const panelTitleId = hasTitle ? (titleId ?? `${toggleId}-title`) : undefined;
+const dialogLabelledBy = panelTitleId ?? ariaLabelledBy;
+const dialogLabel = dialogLabelledBy ? undefined : ariaLabel;
+
+if (!dialogLabelledBy && !dialogLabel) {
+  throw new Error(
+    `OverlayPanel "${toggleId}" requires a title, ariaLabel, or ariaLabelledBy.`,
+  );
+}
+---
+
+<input
+  type="checkbox"
+  id={toggleId}
+  class="modal-toggle ui-overlay-panel-toggle"
+  aria-hidden="true"
+/>
+<div
+  id={dialogId}
+  class:list={[
+    "modal modal-bottom sm:modal-middle ui-overlay-panel-modal",
+    className,
+  ]}
+  role="dialog"
+  aria-modal="true"
+  tabindex="-1"
+  aria-labelledby={dialogLabelledBy}
+  aria-label={dialogLabel}
+>
+  <div
+    class:list={[
+      "modal-box ui-panel p-0 flex flex-col max-h-[85dvh]",
+      !hasTitle && "ui-panel--untitled",
+      maxWidthClass,
+      boxClass,
+    ]}
+  >
+    {
+      hasTitle ? (
+        <div class="ui-panel-header">
+          <span id={panelTitleId} class="ui-panel-title">
+            {title}
+          </span>
+          <label
+            for={toggleId}
+            role="button"
+            tabindex="0"
+            class="btn btn-ghost btn-sm btn-circle"
+            aria-label={closeLabel}
+            data-modal-close
+          >
+            ✕
+          </label>
+        </div>
+      ) : (
+        <label
+          for={toggleId}
+          role="button"
+          tabindex="0"
+          class="btn btn-ghost btn-sm btn-circle ui-panel-floating-close"
+          aria-label={closeLabel}
+          data-modal-close
+        >
+          ✕
+        </label>
+      )
+    }
+
+    <div
+      class:list={[
+        "ui-panel-scroll",
+        !hasTitle && "ui-panel-scroll--untitled",
+        scrollClass,
+      ]}
+    >
+      <slot />
+    </div>
+  </div>
+
+  <label for={toggleId} class="modal-backdrop" aria-label={closeLabel}>
+    Close
+  </label>
+</div>
+
+<script>
+  import "../../runtime/overlay-panel.ts";
+</script>

@@ -1,0 +1,32 @@
+/* Example consumer stylesheet — NOT shipped with bloomwright-ui.
+   Demonstrates the exact wiring a real Astro app performs. */
+
+/* 1. Framework */
+@import "tailwindcss";
+
+/* 2. DaisyUI plugin + the bloomwright-ui include preset (see daisyui-preset.css) */
+@plugin "daisyui" {
+  themes: light, dark;
+  include:
+    "button", "card", "badge", "mockup", "steps", "chat", "list", "modal",
+    "table", "input", "select";
+}
+
+/* 3. Scan bloomwright-ui source so Tailwind emits the classes its components use.
+      An external consumer writes: @source "../node_modules/bloomwright-ui/src"; */
+@source "../../../src";
+
+/* 4. Design tokens the components reference (the consumer owns these). */
+@theme {
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  --font-display: ui-sans-serif, system-ui, sans-serif;
+  --font-reading: Georgia, "Times New Roman", serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Monaco, monospace;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --border: 1px;
+  --shadow-color-base: 0 0 0;
+}
+
+/* 5. bloomwright-ui component styles (imported once, after the theme). */
+@import "bloomwright-ui/styles.css";
